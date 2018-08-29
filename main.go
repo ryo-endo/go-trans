@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -31,6 +32,10 @@ func main() {
 }
 
 func Run(args []string) error {
+	from := flag.String("from", "en", `Set the language code. "en" "ja" "vn"`)
+	to := flag.String("to", "ja", `Set the language code. "en" "ja" "vn"`)
+	flag.Parse()
+
 	if len(args) <= 1 {
 		return fmt.Errorf(`usage: trans "Hello world!"`)
 	}
@@ -40,8 +45,8 @@ func Run(args []string) error {
 		return fmt.Errorf("You may need to set TRANS_API_KEY.\n# export TRANS_API_KEY=your-api-key")
 	}
 
-	input := args[1]
-	out, err := trans(input, key)
+	input := flag.Arg(0)
+	out, err := trans(input, *from, *to, key)
 	if err != nil {
 		return err
 	}
@@ -51,9 +56,7 @@ func Run(args []string) error {
 	return nil
 }
 
-func trans(s string, key string) (string, error) {
-	from := "en"
-	to := "ja"
+func trans(s string, from string, to string, key string) (string, error) {
 	url := fmt.Sprintf("https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=%s&to=%s", from, to)
 	body := strings.NewReader(fmt.Sprintf("[{'Text':'%s'}]", s))
 
