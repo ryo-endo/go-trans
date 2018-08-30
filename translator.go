@@ -8,18 +8,22 @@ import (
 	"strings"
 )
 
-type Translator struct {
-	key string
+type Translator interface {
+	Trans(s string, from string, to string) (string, error)
 }
 
-func NewTranslator(key string) *Translator {
-	t := new(Translator)
+func NewAzureTranslator(key string) Translator {
+	t := new(AzureTranslator)
 	t.key = key
 
 	return t
 }
 
-func (t *Translator) Trans(s string, from string, to string) (string, error) {
+type AzureTranslator struct {
+	key string
+}
+
+func (t *AzureTranslator) Trans(s string, from string, to string) (string, error) {
 	url := fmt.Sprintf("https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=%s&to=%s", from, to)
 	body := strings.NewReader(fmt.Sprintf("[{'Text':'%s'}]", s))
 
@@ -52,7 +56,7 @@ func (t *Translator) Trans(s string, from string, to string) (string, error) {
 
 }
 
-func (t *Translator) callTranslateApi(url string, body *strings.Reader, key string) (*http.Response, error) {
+func (t *AzureTranslator) callTranslateApi(url string, body *strings.Reader, key string) (*http.Response, error) {
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		return nil, err

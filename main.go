@@ -41,7 +41,7 @@ func Run(args []string) error {
 		return fmt.Errorf("You may need to set TRANS_API_KEY.\n# export TRANS_API_KEY=your-api-key")
 	}
 
-	transtalor := NewTranslator(key)
+	transtalor := NewAzureTranslator(key)
 
 	input := flag.Arg(0)
 	out, err := transtalor.Trans(input, *from, *to)
