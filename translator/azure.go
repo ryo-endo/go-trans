@@ -23,17 +23,17 @@ type errorResponse struct {
 }
 
 func NewAzure(key string) Translator {
-	t := new(Azure)
+	t := new(azure)
 	t.key = key
 
 	return t
 }
 
-type Azure struct {
+type azure struct {
 	key string
 }
 
-func (t *Azure) Trans(s string, from string, to string) (string, error) {
+func (t *azure) Trans(s string, from string, to string) (string, error) {
 	url := fmt.Sprintf("https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=%s&to=%s", from, to)
 	body := strings.NewReader(fmt.Sprintf("[{'Text':'%s'}]", s))
 
@@ -66,7 +66,7 @@ func (t *Azure) Trans(s string, from string, to string) (string, error) {
 
 }
 
-func (t *Azure) callTranslateApi(url string, body *strings.Reader, key string) (*http.Response, error) {
+func (t *azure) callTranslateApi(url string, body *strings.Reader, key string) (*http.Response, error) {
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		return nil, err
