@@ -3,22 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/ryo-endo/go-trans/translator"
 	"os"
 )
-
-type transResponse []struct {
-	Translations []struct {
-		Text string `json:"text"`
-		To   string `json:"to"`
-	} `json:"translations"`
-}
-
-type errorResponse struct {
-	Error struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-	} `json:"error"`
-}
 
 func main() {
 	if err := Run(os.Args); err != nil {
@@ -41,7 +28,7 @@ func Run(args []string) error {
 		return fmt.Errorf("You may need to set TRANS_API_KEY.\n# export TRANS_API_KEY=your-api-key")
 	}
 
-	transtalor := NewAzureTranslator(key)
+	transtalor := translator.NewAzure(key)
 
 	input := flag.Arg(0)
 	out, err := transtalor.Trans(input, *from, *to)

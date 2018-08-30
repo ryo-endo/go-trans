@@ -1,4 +1,4 @@
-package main
+package translator
 
 import (
 	"encoding/json"
@@ -8,22 +8,32 @@ import (
 	"strings"
 )
 
-type Translator interface {
-	Trans(s string, from string, to string) (string, error)
+type transResponse []struct {
+	Translations []struct {
+		Text string `json:"text"`
+		To   string `json:"to"`
+	} `json:"translations"`
 }
 
-func NewAzureTranslator(key string) Translator {
-	t := new(AzureTranslator)
+type errorResponse struct {
+	Error struct {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+	} `json:"error"`
+}
+
+func NewAzure(key string) Translator {
+	t := new(Azure)
 	t.key = key
 
 	return t
 }
 
-type AzureTranslator struct {
+type Azure struct {
 	key string
 }
 
-func (t *AzureTranslator) Trans(s string, from string, to string) (string, error) {
+func (t *Azure) Trans(s string, from string, to string) (string, error) {
 	url := fmt.Sprintf("https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=%s&to=%s", from, to)
 	body := strings.NewReader(fmt.Sprintf("[{'Text':'%s'}]", s))
 
@@ -56,7 +66,7 @@ func (t *AzureTranslator) Trans(s string, from string, to string) (string, error
 
 }
 
-func (t *AzureTranslator) callTranslateApi(url string, body *strings.Reader, key string) (*http.Response, error) {
+func (t *Azure) callTranslateApi(url string, body *strings.Reader, key string) (*http.Response, error) {
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		return nil, err
