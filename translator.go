@@ -8,11 +8,14 @@ import (
 	"strings"
 )
 
-func trans(s string, from string, to string, key string) (string, error) {
+type Translator struct {
+}
+
+func (t *Translator) Trans(s string, from string, to string, key string) (string, error) {
 	url := fmt.Sprintf("https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=%s&to=%s", from, to)
 	body := strings.NewReader(fmt.Sprintf("[{'Text':'%s'}]", s))
 
-	resp, err := callTranslateApi(url, body, key)
+	resp, err := t.callTranslateApi(url, body, key)
 	if err != nil {
 		return "", fmt.Errorf("Cannot connect to the api server.\n%s", err.Error())
 	}
@@ -41,7 +44,7 @@ func trans(s string, from string, to string, key string) (string, error) {
 
 }
 
-func callTranslateApi(url string, body *strings.Reader, key string) (*http.Response, error) {
+func (t *Translator) callTranslateApi(url string, body *strings.Reader, key string) (*http.Response, error) {
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		return nil, err
