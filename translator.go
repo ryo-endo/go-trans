@@ -9,13 +9,21 @@ import (
 )
 
 type Translator struct {
+	key string
 }
 
-func (t *Translator) Trans(s string, from string, to string, key string) (string, error) {
+func NewTranslator(key string) *Translator {
+	t := new(Translator)
+	t.key = key
+
+	return t
+}
+
+func (t *Translator) Trans(s string, from string, to string) (string, error) {
 	url := fmt.Sprintf("https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=%s&to=%s", from, to)
 	body := strings.NewReader(fmt.Sprintf("[{'Text':'%s'}]", s))
 
-	resp, err := t.callTranslateApi(url, body, key)
+	resp, err := t.callTranslateApi(url, body, t.key)
 	if err != nil {
 		return "", fmt.Errorf("Cannot connect to the api server.\n%s", err.Error())
 	}
