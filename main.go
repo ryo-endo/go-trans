@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ryo-endo/go-trans/translator"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -30,7 +31,7 @@ func Run(args []string) error {
 
 	transtalor := translator.NewAzure(key)
 
-	input := flag.Arg(0)
+	input := strings.Join(flag.Args(), " ")
 	out, err := transtalor.Trans(input, *from, *to)
 	if err != nil {
 		return err
