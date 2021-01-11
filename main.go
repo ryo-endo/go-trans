@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"github.com/ryo-endo/go-trans/translator"
@@ -18,6 +19,7 @@ func main() {
 func Run(args []string) error {
 	from := flag.String("from", "en", `Set the language code. "en" "ja" "vn"`)
 	to := flag.String("to", "ja", `Set the language code. "en" "ja" "vn"`)
+	interactive := flag.Bool("i", false, `interactive mode.`)
 	flag.Parse()
 
 	if len(args) <= 1 {
@@ -29,15 +31,48 @@ func Run(args []string) error {
 		return fmt.Errorf("You may need to set TRANS_API_KEY.\n# export TRANS_API_KEY=your-api-key")
 	}
 
-	transtalor := translator.NewAzure(key)
+	trans := translator.NewAzure(key)
+
+	if *interactive {
+		err := interactiveTranslate(trans, *from, *to)
+		if err != nil {
+			return err
+		}
+	} else {
+		err := translate(trans, *from, *to)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func translate(translator translator.Translator, from string, to string) error {
 
 	input := strings.Join(flag.Args(), " ")
-	out, err := transtalor.Trans(input, *from, *to)
+	out, err := translator.Trans(input, from, to)
 	if err != nil {
 		return err
 	}
-
 	fmt.Println(out)
 
 	return nil
+}
+
+func interactiveTranslate(translator translator.Translator, from string, to string) error {
+
+	for {
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
+
+		out, err := translator.Trans(scanner.Text(), from, to)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(out)
+	}
+
+	//return nil
 }
