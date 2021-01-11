@@ -17,9 +17,10 @@ func main() {
 }
 
 func Run(args []string) error {
-	from := flag.String("from", "en", `Set the language code. "en" "ja" "vn"`)
-	to := flag.String("to", "ja", `Set the language code. "en" "ja" "vn"`)
-	interactive := flag.Bool("i", false, `interactive mode.`)
+	flg := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	from := flg.String("from", "en", `Set the language code. "en" "ja" "vn"`)
+	to := flg.String("to", "ja", `Set the language code. "en" "ja" "vn"`)
+	interactive := flg.Bool("i", false, `interactive mode.`)
 	flag.Parse()
 
 	if len(args) <= 1 {
